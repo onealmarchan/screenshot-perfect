@@ -1,4 +1,5 @@
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { CHARACTERISTICS, tone, type CharKey } from "@/data/characteristics";
 
 const N = 9;
@@ -53,22 +54,22 @@ export function QualityWheel({ highlight, selected, onSelect, center, spin, sequ
             const ix = 200 + 140 * Math.cos(mid); const iy = 200 + 140 * Math.sin(mid);
             return (
               <g key={c.key}
-                role={interactive ? "button" : undefined}
-                tabIndex={interactive ? 0 : undefined}
-                aria-pressed={interactive ? selected === c.key : undefined}
-                aria-label={interactive ? c.name : undefined}
-                onClick={interactive ? () => onSelect(c.key) : undefined}
-                onKeyDown={interactive ? (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onSelect(c.key); } } : undefined}
+                onClick={onSelect ? () => onSelect(c.key) : undefined}
                 onMouseEnter={interactive ? () => setTip(i) : undefined}
                 onMouseLeave={interactive ? () => setTip(null) : undefined}
                 onFocus={interactive ? () => setTip(i) : undefined}
                 onBlur={interactive ? () => setTip(null) : undefined}
-                style={{ cursor: interactive ? "pointer" : undefined, outline: "none" }}
+                style={{ cursor: interactive ? "pointer" : undefined }}
                 className="group">
                 <path d={arc(200, 200, 92, 190, a0, a1)}
                   style={{ fill: tone(c.key), opacity: lit ? 1 : 0.22, transition: "opacity .5s, transform .3s", transformOrigin: "200px 200px", transform: selected === c.key ? "scale(1.04)" : undefined }}
-                  className={interactive ? "group-focus-visible:[stroke:var(--ink)] group-focus-visible:[stroke-width:4]" : undefined} />
-                {icons && <Icon x={ix - 18} y={iy - 18} width={36} height={36} strokeWidth={2} style={{ color: "var(--surface)", opacity: lit ? 1 : 0.7 }} />}
+                  className={interactive ? "group-focus-within:[stroke:var(--ink)] group-focus-within:[stroke-width:4]" : undefined} />
+                {icons && (onSelect ? <foreignObject x={ix-23} y={iy-23} width={46} height={46}>
+                  <Button variant="deck" size="deck" className="wheel-control" aria-label={c.name} aria-pressed={selected===c.key}
+                    onClick={e=>{ e.stopPropagation(); onSelect(c.key); }} style={{color:"var(--surface)"}}>
+                    <Icon aria-hidden="true" strokeWidth={2}/>
+                  </Button>
+                </foreignObject> : <Icon x={ix - 18} y={iy - 18} width={36} height={36} strokeWidth={2} style={{ color: "var(--surface)", opacity: lit ? 1 : 0.7 }} />)}
               </g>
             );
           })}
@@ -79,11 +80,12 @@ export function QualityWheel({ highlight, selected, onSelect, center, spin, sequ
         )}
       </svg>
       {interactive && tip !== null && (() => {
-        const mid = angle(tip); const c = CHARACTERISTICS[tip]!;
-        const x = 50 + 30 * Math.cos(mid); const y = 50 + 30 * Math.sin(mid);
+        const mid = angle(tip); const c = CHARACTERISTICS[tip];
+        if (!c) return null;
+        const y = 50 + 30 * Math.sin(mid);
         return (
-          <div role="tooltip" className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-lg bg-popover px-3 py-1.5 text-popover-foreground shadow-lg"
-            style={{ left: `${Math.min(75, Math.max(25, x))}%`, top: `${y}%`, fontSize: 14 }}>
+          <div role="tooltip" className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-[130%] rounded-lg bg-popover px-3 py-1.5 text-popover-foreground shadow-lg"
+            style={{ left: "50%", top: `${y}%`, fontSize: 14, maxWidth: "min(280px, 90%)", width: "max-content" }}>
             {c.name} <span className="t-en opacity-80">({c.en})</span>
           </div>
         );

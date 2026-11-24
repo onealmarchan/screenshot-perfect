@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Presentation architecture
+- Keep the deck client-only with fixed content and hash navigation; no persistence or server operations are needed.
+- Store slide content in typed data and share characteristics across diagrams and badges to preserve consistency.
+- Use fluid slide layouts with internal vertical overflow, rather than a scaled fixed canvas, to preserve readability on phones.

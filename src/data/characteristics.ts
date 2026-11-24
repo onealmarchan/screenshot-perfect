@@ -30,4 +30,8 @@ export const CHARACTERISTICS: Characteristic[] = [
   { key: "safety", name: "Seguridad física", en: "Safety", icon: HardHat, description: "Evitar que fallos del software causen daños físicos.", pill: "Nueva 2023" },
 ];
 
-export const charByKey = (k: CharKey) => CHARACTERISTICS.find((c) => c.key === k)!;
+export function charByKey(k: CharKey): Characteristic {
+  const result = CHARACTERISTICS.find(c => c.key === k);
+  if (!result) throw new Error(`Unknown characteristic: ${k}`);
+  return result;
+}

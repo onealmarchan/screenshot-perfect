@@ -1,6 +1,7 @@
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
 import { useEffect } from "react";
 import { tone, type ToneKey } from "@/data/characteristics";
+import { toneStyle } from "../primitives";
 import { EASE } from "../motion";
 
 const svgCls = "h-auto w-full max-h-full";
@@ -127,7 +128,7 @@ export function Balance() {
 
 export function LifecycleTimeline({ steps, t }: { steps: string[]; t: ToneKey }) {
   const top = steps.slice(0, 5);
-  const base = steps[5]!;
+  const base = steps[5] ?? "";
   return (
     <div className="flex flex-col gap-card">
       <ol className="relative grid gap-card md:grid-cols-5">
@@ -138,13 +139,13 @@ export function LifecycleTimeline({ steps, t }: { steps: string[]; t: ToneKey })
         {top.map((s, i) => (
           <motion.li key={s} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.08, ease: EASE, duration: 0.5 }}
             className="relative flex items-start gap-4 md:flex-col md:items-center md:text-center">
-            <span className="chip-num z-10 h-11 min-w-11 shrink-0 bg-surface" style={{ "--tone": tone(t) } as React.CSSProperties}>{String(i + 1).padStart(2, "0")}</span>
+            <span className="chip-num z-10 h-11 min-w-11 shrink-0 bg-surface" style={toneStyle(t)}>{String(i + 1).padStart(2, "0")}</span>
             <p className="t-card text-ink">{s}</p>
           </motion.li>
         ))}
       </ol>
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, ease: EASE }}
-        className="deck-card flex items-center gap-4" style={{ "--tone": tone(t) } as React.CSSProperties}>
+        className="deck-card flex items-center gap-4" style={toneStyle(t)}>
         <span className="card-bar" aria-hidden />
         <span className="chip-num">06</span>
         <p className="t-card text-ink">{base}</p>

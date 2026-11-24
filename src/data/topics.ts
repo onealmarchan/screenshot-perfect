@@ -27,8 +27,9 @@ export function topicProgress(topic: number, slide: number): number {
   const cur = topicOf(slide);
   if (cur === 0 || topic > cur) return 0;
   if (topic < cur) return 1;
-  const t = TOPICS[topic - 1]!;
-  const end = topic < 6 ? TOPICS[topic]!.start - 1 : TOTAL_SLIDES;
+  const t = TOPICS[topic - 1];
+  if (!t) return 0;
+  const end = topic < 6 ? (TOPICS[topic]?.start ?? 26) - 1 : TOTAL_SLIDES;
   return (slide - t.start + 1) / (end - t.start + 1);
 }
 

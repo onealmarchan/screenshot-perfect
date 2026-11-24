@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { CardData } from "@/data/slides";
 import { tone, type ToneKey } from "@/data/characteristics";
 import { bar, item } from "./motion";
 
-export const toneStyle = (k: ToneKey) => ({ "--tone": tone(k) }) as CSSProperties;
+export const toneStyle = (k: ToneKey) => ({ "--tone": tone(k), color: "var(--ink)" });
 
 export function Pill({ children, t }: { children: ReactNode; t?: ToneKey }) {
   return <span className="pill" style={t ? toneStyle(t) : undefined}>{children}</span>;
@@ -14,7 +14,7 @@ export function En({ children }: { children: ReactNode }) {
   return <span className="t-en text-ink-2">({children})</span>;
 }
 
-export function Card({ data, index, t, numbered }: { data: CardData; index: number; t: ToneKey; numbered?: boolean }) {
+export function Card({ data, index, t, numbered }: { data: CardData; index: number; t: ToneKey; numbered?: boolean | undefined }) {
   const Icon = data.icon;
   return (
     <motion.article variants={item} className="deck-card flex flex-col gap-3" style={toneStyle(data.tone ?? t)}>
@@ -37,7 +37,7 @@ const COLS: Record<number, string> = {
   3: "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
 };
 
-export function CardGrid({ cards, t, cols = 3, numbered }: { cards: CardData[]; t: ToneKey; cols?: 2 | 3; numbered?: boolean }) {
+export function CardGrid({ cards, t, cols = 3, numbered }: { cards: CardData[]; t: ToneKey; cols?: 2 | 3 | undefined; numbered?: boolean | undefined }) {
   return (
     <div className={`grid gap-card ${COLS[cols]}`}>
       {cards.map((c, i) => <Card key={c.title} data={c} index={i} t={t} numbered={numbered} />)}

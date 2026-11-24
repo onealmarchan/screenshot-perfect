@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+
 import { ArrowRight, RefreshCw } from "lucide-react";
 import { useState, type CSSProperties } from "react";
 import { charByKey, CHARACTERISTICS, tone, type CharKey } from "@/data/characteristics";
@@ -17,7 +19,7 @@ import {
 export interface SlideProps { s: SlideData; goTo: (n: number) => void }
 
 function Header({ s, aside }: { s: SlideData; aside?: React.ReactNode }) {
-  const label = s.badgeLabel ?? (s.badge?.length === 1 ? charByKey(s.badge[0]!).name : undefined);
+  const label = s.badgeLabel ?? (s.badge?.length === 1 ? charByKey(s.badge[0] ?? "funcional").name : undefined);
   const head = (
     <div className="flex min-w-0 flex-col gap-3">
       <motion.div variants={item} className="flex flex-wrap items-center gap-3">
@@ -61,7 +63,7 @@ function Cover({ s }: SlideProps) {
       <motion.div variants={item} className="hide-short flex h-[22dvh] justify-center lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-[60vh]">
         <QualityWheel spin sequence dark center="25010" className="aspect-square h-full" label="Rueda con las 9 características de calidad" />
       </motion.div>
-      <motion.dl variants={item} className="grid gap-4 border-t pt-5" style={{ borderColor: "rgba(247,245,240,.18)" }}>
+      <motion.dl variants={item} className="grid gap-4 border-t pt-5" style={{ borderColor: "var(--dark-border)" }}>
         <div><dt className="t-label text-on-dark-2">Institución</dt><dd className="font-semibold text-on-dark" style={{ fontSize: "var(--fs-card)" }}>Universidad Politécnica Territorial del Oeste de Sucre "Clodosbaldo Russián"</dd></div>
         <div><dt className="t-label text-on-dark-2">Acreditable</dt><dd className="font-semibold text-on-dark" style={{ fontSize: "var(--fs-card)" }}>Trayecto IV · Profesora Rosemid Mago</dd></div>
         <div><dt className="t-label text-on-dark-2">Estudiantes</dt>
@@ -76,14 +78,15 @@ function Index({ s, goTo }: SlideProps) {
     <Frame header={<Header s={s} />}>
       <div className="grid gap-card md:grid-cols-2 xl:grid-cols-3">
         {INDEX_ITEMS.map((txt, i) => {
-          const t = TOPICS[i]!;
+          const t = TOPICS[i];
+          if (!t) return null;
           return (
-            <motion.button key={txt} variants={item} onClick={() => goTo(t.start)} className="deck-card flex flex-col items-start gap-3 text-left" style={toneStyle(t.tone)}>
+            <motion.div key={txt} variants={item} style={toneStyle(t.tone)}><Button variant="deck" size="deck" onClick={() => goTo(t.start)} className="deck-card flex h-full w-full flex-col items-start gap-3 text-left">
               <motion.span variants={bar} className="card-bar" aria-hidden />
               <span className="font-mono text-4xl font-medium" style={{ color: tone(t.tone) }} aria-hidden>{String(i + 1).padStart(2, "0")}</span>
               <span className="t-card-title text-ink">{txt}</span>
               <span className="t-label mt-auto inline-flex items-center gap-2 text-muted-foreground">Ir a la diapositiva {t.start} <ArrowRight className="h-4 w-4" aria-hidden /></span>
-            </motion.button>
+            </Button></motion.div>
           );
         })}
       </div>
@@ -103,7 +106,7 @@ function What({ s }: SlideProps) {
             </motion.li>
           ))}
         </ul>
-        <Visual><div className="w-full max-w-xl xl:col-span-5"><Timeline2011 /></div></Visual>
+        <div className="xl:col-span-5"><Visual><div className="w-full max-w-xl"><Timeline2011 /></div></Visual></div>
       </div>
     </Frame>
   );
@@ -117,7 +120,7 @@ function Cards({ s }: SlideProps) {
   const V = s.visual ? VISUALS[s.visual] : null;
   return (
     <Frame header={<Header s={s} aside={V ? <V /> : undefined} />}>
-      <CardGrid cards={s.cards!} t={s.tone} cols={s.cols} numbered={s.numbered} />
+      <CardGrid cards={s.cards ?? []} t={s.tone} cols={s.cols} numbered={s.numbered} />
       {s.band && (
         <motion.div variants={item} className="flex flex-wrap items-center gap-4 rounded-2xl border p-card" style={{ background: "color-mix(in oklab, var(--c-flex) 12%, var(--surface))" }}>
           <ArrowRight className="h-7 w-7 shrink-0" style={{ color: tone("flex") }} aria-hidden />
@@ -148,18 +151,19 @@ function Actors({ s }: SlideProps) {
 
 function Tabs({ s }: SlideProps) {
   const [a, setA] = useState(0);
-  const tab = USE_TABS[a]!;
+  const tab = USE_TABS[a] ?? USE_TABS[0];
+  if (!tab) return null;
   const Icon = tab.icon;
   const move = (d: number) => setA((v) => (v + d + 5) % 5);
   return (
     <Frame header={<Header s={s} />}>
       <motion.div variants={item} role="tablist" aria-label="Características de calidad en uso 2011" className="flex flex-wrap gap-2">
         {USE_TABS.map((t, i) => (
-          <button key={t.name} role="tab" id={`tab-${i}`} aria-selected={a === i} aria-controls="tab-panel" tabIndex={a === i ? 0 : -1}
+          <Button variant="deck" size="deck" key={t.name} role="tab" id={`tab-${i}`} aria-selected={a === i} aria-controls="tab-panel" tabIndex={a === i ? 0 : -1}
             onClick={() => setA(i)} onKeyDown={(e) => { if (e.key === "Home") setA(0); if (e.key === "End") setA(4); if (e.key === "ArrowDown") { e.preventDefault(); move(1); } if (e.key === "ArrowUp") { e.preventDefault(); move(-1); } }}
             className="seg-btn inline-flex items-center gap-2 border bg-surface">
             <t.icon className="h-5 w-5" aria-hidden /> {t.name}
-          </button>
+          </Button>
         ))}
       </motion.div>
       <div className="grid items-center gap-block xl:grid-cols-12">
@@ -171,7 +175,7 @@ function Tabs({ s }: SlideProps) {
           <p className="t-card">{tab.def}</p>
           {tab.example && <p className="t-card"><strong className="text-ink">Ejemplo:</strong> {tab.example}</p>}
         </motion.div>
-        <Visual><div className="w-full max-w-[min(320px,28vh)] xl:col-span-5"><Pentagon active={a} /></div></Visual>
+        <div className="xl:col-span-5"><Visual><div className="w-full max-w-[min(320px,28vh)]"><Pentagon active={a} /></div></Visual></div>
       </div>
     </Frame>
   );
@@ -180,7 +184,7 @@ function Tabs({ s }: SlideProps) {
 function Uso2023({ s }: SlideProps) {
   return (
     <Frame header={<Header s={s} />}>
-      <CardGrid cards={s.cards!} t="uso" cols={3} />
+      <CardGrid cards={s.cards ?? []} t="uso" cols={3} />
       <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-2xl border bg-surface p-card" role="img" aria-label="5 características en 2011, 3 características en 2023">
         <span className="t-card-title text-ink"><span className="font-mono text-4xl">5</span> características <span className="t-label text-muted-foreground">(2011)</span></span>
         <ArrowRight className="h-7 w-7" style={{ color: tone("uso") }} aria-hidden />
@@ -210,7 +214,7 @@ function Wheel({ s }: SlideProps) {
           </div>
           <h3 className="t-card-title text-ink">{c.name} <En>{c.en}</En></h3>
           <p className="t-card">{c.description}</p>
-          <p className="t-label text-muted-foreground">Pulsa un segmento de la rueda</p>
+          
         </motion.div>
       </div>
     </Frame>
@@ -221,7 +225,7 @@ function Toggle<T extends string>({ options, value, onChange, label }: { options
   return (
     <div role="group" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-full border bg-surface p-1">
       {options.map((o) => (
-        <button key={o.v} aria-pressed={value === o.v} onClick={() => onChange(o.v)} className="seg-btn">{o.l}</button>
+        <Button variant="deck" size="deck" key={o.v} aria-pressed={value === o.v} onClick={() => onChange(o.v)} className="seg-btn">{o.l}</Button>
       ))}
     </div>
   );
@@ -254,7 +258,7 @@ function Scope({ s }: SlideProps) {
             )}
           </div>
         </motion.div>
-        <Visual><div className="w-full max-w-md xl:col-span-5"><ScopeSplit split={y === "2023"} /></div></Visual>
+        <div className="xl:col-span-5"><Visual><div className="w-full max-w-md"><ScopeSplit split={y === "2023"} /></div></Visual></div>
       </div>
     </Frame>
   );
@@ -274,7 +278,7 @@ function Safety({ s }: SlideProps) {
       </motion.div>
       <div className="grid gap-card md:grid-cols-2">
         {cards.map(({ k, title, sub, text, c, t }) => (
-          <motion.article key={k} variants={item} animate={{ opacity: v === k ? 1 : 0.55, scale: v === k ? 1 : 0.98 }} transition={{ duration: 0.3 }}
+          <motion.article key={k} variants={item} animate={{ scale: v === k ? 1 : 0.98 }} transition={{ duration: 0.3 }}
             className="deck-card flex flex-col gap-3" style={toneStyle(t)} aria-current={v === k ? "true" : undefined}>
             <span className="card-bar" aria-hidden />
             <c.icon className="h-10 w-10" style={{ color: tone(t) }} aria-hidden />
@@ -305,10 +309,10 @@ function NameShiftCard({ d, i }: { d: (typeof NAME_SHIFTS)[number]; i: number })
       </h3>
       <p className="t-card">{d.text}</p>
       {d.chips && <ul className="flex flex-wrap gap-2">{d.chips.map((c) => <li key={c} className="pill whitespace-normal" style={{ whiteSpace: "normal" }}>{c}</li>)}</ul>}
-      <button aria-pressed={before} onClick={() => setBefore((b) => !b)} onFocus={() => setBefore(true)} onBlur={() => setBefore(false)}
+      <Button variant="deck" size="deck" aria-pressed={before} onClick={() => setBefore((b) => !b)} onFocus={() => setBefore(true)} onBlur={() => setBefore(false)}
         className="mt-auto inline-flex w-fit items-center gap-2 rounded-full border bg-surface px-4 py-2 font-semibold text-ink">
         <RefreshCw className="h-4 w-4" aria-hidden /> Ver cambio
-      </button>
+      </Button>
     </motion.article>
   );
 }
@@ -325,7 +329,7 @@ function NameShift({ s }: SlideProps) {
 
 function Table({ s }: SlideProps) {
   const [v, setV] = useState<"2011" | "2023" | "both">("both");
-  const dim = (col: "2011" | "2023"): CSSProperties => ({ opacity: v === "both" || v === col ? 1 : 0.35, transition: "opacity .3s" });
+  const dim = (col: "2011" | "2023"): CSSProperties => ({ background: v === "both" || v === col ? "var(--surface)" : "var(--surface-2)", transition: "background .3s" });
   return (
     <Frame header={<Header s={s} />}>
       <motion.div variants={item}><Toggle label="Versión" value={v} onChange={setV} options={[{ v: "2011", l: "2011" }, { v: "2023", l: "2023" }, { v: "both", l: "Ambas" }]} /></motion.div>
@@ -363,13 +367,13 @@ function Closing({ s }: SlideProps) {
       <motion.h2 variants={item} data-slide-title tabIndex={-1} className="t-h2 text-on-dark outline-none">{s.title}</motion.h2>
       <ol className="grid gap-card md:grid-cols-3">
         {CONCLUSIONS.map((c, i) => (
-          <motion.li key={c} variants={item} className="flex flex-col gap-3 rounded-2xl border p-card" style={{ borderColor: "rgba(247,245,240,.16)", background: "rgba(247,245,240,.05)" }}>
+          <motion.li key={c} variants={item} className="flex flex-col gap-3 rounded-2xl border p-card" style={{ borderColor: "var(--dark-border)", background: "var(--dark-surface)" }}>
             <span className="font-mono text-3xl text-brand">{String(i + 1).padStart(2, "0")}</span>
             <p className="text-on-dark" style={{ fontSize: "var(--fs-card)", lineHeight: 1.55 }}>{c}</p>
           </motion.li>
         ))}
       </ol>
-      <motion.div variants={item} className="flex flex-wrap items-center gap-block border-t pt-5" style={{ borderColor: "rgba(247,245,240,.18)" }}>
+      <motion.div variants={item} className="flex flex-wrap items-center gap-block border-t pt-5" style={{ borderColor: "var(--dark-border)" }}>
         <QualityWheel spin sequence dark icons={false} className="hide-short h-24 w-24 shrink-0" />
         <div className="flex min-w-0 flex-col gap-2">
           <p className="t-cover text-on-dark" style={{ fontSize: "clamp(2rem, 2vw + 3vh, 4rem)" }}>¡Gracias! <span className="text-brand">¿Preguntas?</span></p>
@@ -380,7 +384,7 @@ function Closing({ s }: SlideProps) {
   );
 }
 
-export const RENDERERS: Record<SlideData["kind"], (p: SlideProps) => React.ReactElement> = {
+export const RENDERERS: Record<SlideData["kind"], (p: SlideProps) => React.ReactElement | null> = {
   cover: Cover, index: Index, what: What, lifecycle: Lifecycle, cards: Cards, actors: Actors, tabs: Tabs,
   uso2023: Uso2023, wheel: Wheel, scope: Scope, safety: Safety, nameshift: NameShift, table: Table, closing: Closing,
 };
