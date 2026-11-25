@@ -81,7 +81,7 @@ function Index({ s, goTo }: SlideProps) {
           const t = TOPICS[i];
           if (!t) return null;
           return (
-            <motion.div key={txt} variants={item} style={toneStyle(t.tone)}><Button variant="deck" size="deck" onClick={() => goTo(t.start)} className="deck-card flex h-full w-full flex-col items-start gap-3 text-left">
+            <motion.div key={txt} variants={item} style={toneStyle(t.tone)}><Button variant="deck" size="deck" onClick={() => goTo(t.start)} className="deck-card flex h-full w-full flex-col items-start justify-start gap-3 whitespace-normal text-left">
               <motion.span variants={bar} className="card-bar" aria-hidden />
               <span className="font-mono text-4xl font-medium" style={{ color: tone(t.tone) }} aria-hidden>{String(i + 1).padStart(2, "0")}</span>
               <span className="t-card-title text-ink">{txt}</span>
